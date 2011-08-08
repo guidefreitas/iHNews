@@ -24,6 +24,7 @@
 		7956B1A913F011CC00883317 /* libFlurry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7956B1A813F011CC00883317 /* libFlurry.a */; };
 		7956B1AB13F011DE00883317 /* ProjectApiKey.txt in Resources */ = {isa = PBXBuildFile; fileRef = 7956B1AA13F011DE00883317 /* ProjectApiKey.txt */; };
 		7956B1AD13F0126F00883317 /* README in Resources */ = {isa = PBXBuildFile; fileRef = 7956B1AC13F0126F00883317 /* README */; };
+		797DF98913F0935500C63108 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 797DF98813F0935500C63108 /* Default@2x.png */; };
 		798875C813EDB19800DA6B67 /* BrowserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 798875C613EDB19700DA6B67 /* BrowserViewController.m */; };
 		798875C913EDB19800DA6B67 /* BrowserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 798875C713EDB19800DA6B67 /* BrowserViewController.xib */; };
 		798875CD13EDBE5B00DA6B67 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 798875CB13EDBE5B00DA6B67 /* LoginViewController.m */; };
@@ -101,6 +102,7 @@
 		7956B1A813F011CC00883317 /* libFlurry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFlurry.a; path = "../../../../Downloads/Flurry iPhone SDK v2.8.4/FlurryLib/libFlurry.a"; sourceTree = "<group>"; };
 		7956B1AA13F011DE00883317 /* ProjectApiKey.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ProjectApiKey.txt; sourceTree = "<group>"; };
 		7956B1AC13F0126F00883317 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		797DF98813F0935500C63108 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		798875C513EDB19700DA6B67 /* BrowserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrowserViewController.h; sourceTree = "<group>"; };
 		798875C613EDB19700DA6B67 /* BrowserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrowserViewController.m; sourceTree = "<group>"; };
 		798875C713EDB19800DA6B67 /* BrowserViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = BrowserViewController.xib; sourceTree = "<group>"; };
@@ -283,6 +285,7 @@
 		79D4084413ECD9B100417A82 = {
 			isa = PBXGroup;
 			children = (
+				797DF98813F0935500C63108 /* Default@2x.png */,
 				79D4085913ECD9B100417A82 /* iHNews */,
 				79D4085213ECD9B100417A82 /* Frameworks */,
 				79D4085013ECD9B100417A82 /* Products */,
@@ -511,6 +514,7 @@
 				793EBFC813F0485E00FE9515 /* Icon@2x.png in Resources */,
 				793EBFCA13F04A7600FE9515 /* Default.png in Resources */,
 				793EBFDC13F04CF700FE9515 /* MainWindow-iPad.xib in Resources */,
+				797DF98913F0935500C63108 /* Default@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
