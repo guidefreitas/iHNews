@@ -7,6 +7,10 @@
 //
 
 #import "iHNewsAppDelegate.h"
+#import "NewsViewController.h"
+#import "NewPostsViewController.h"
+#import "NewCommentsViewController.h"
+#import "FlurryAPI.h"
 
 @implementation iHNewsAppDelegate
 
@@ -15,9 +19,34 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Override point for customization after application launch.
-    // Add the tab bar controller's current view as a subview of the window
+    [FlurryAPI startSession:@"2ZYHIXFWEI5ZQE2EJMP2"];
+    
     self.window.rootViewController = self.tabBarController;
+    
+    UINavigationController *navConHot = [[UINavigationController alloc] init];
+    
+    NewsViewController *hotPostsViewController = [[NewsViewController alloc] init];
+    hotPostsViewController.title = @"Hot Posts";
+    navConHot.tabBarItem.image = [UIImage imageNamed:@"fire.png"];
+    [navConHot pushViewController:hotPostsViewController animated:NO];
+    
+    UINavigationController *navConPosts = [[UINavigationController alloc] init];
+    NewPostsViewController *newPosts = [[NewPostsViewController alloc] init];
+    newPosts.title = @"New Posts";
+    navConPosts.tabBarItem.image = [[UIImage imageNamed:@"newspaper.png"] autorelease];
+    [navConPosts pushViewController:newPosts animated:NO];
+    
+    UINavigationController *navConComments = [[UINavigationController alloc] init];
+    NewCommentsViewController *commentsViewController = [[NewCommentsViewController alloc] init];
+    navConComments.tabBarItem.image = [[UIImage imageNamed:@"comments.png"] autorelease];
+    commentsViewController.title = @"Comments";
+    [navConComments pushViewController:commentsViewController animated:NO];
+    
+    
+    NSArray *viewsController = [[NSArray alloc] initWithObjects:navConHot, navConPosts, navConComments,nil];
+    
+    [self.tabBarController setViewControllers:viewsController];
+    
     [self.window makeKeyAndVisible];
     return YES;
 }

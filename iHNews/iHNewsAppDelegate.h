@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
+
 @interface iHNewsAppDelegate : NSObject <UIApplicationDelegate, UITabBarControllerDelegate>
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
