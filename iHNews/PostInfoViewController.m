@@ -57,6 +57,7 @@
     NSString *urlString = [[NSString alloc] initWithFormat:@"http://api.ihackernews.com/post/%@", _newId];
     NSLog(@"Opening URL: %@", urlString);
     NSURL *url = [NSURL URLWithString:urlString];
+    [urlString release];
     __block ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
     [request setCompletionBlock:^{
         
@@ -74,7 +75,7 @@
             UIBarButtonItem *browserButton = [[UIBarButtonItem alloc] initWithTitle:@"Browser" style:UIBarButtonItemStyleDone target:self action:@selector(btnBrowserClicked:)];
             
             self.navigationItem.rightBarButtonItem = browserButton;
-            
+            [browserButton release];
             
             [SVProgressHUD dismiss];
             [[self tableView] reloadData];
@@ -192,7 +193,9 @@
         
         if(indexPath.row == 0){
             cell.textLabel.text = [postData objectForKey:@"title"];
-            cell.descriptionLabel.text = [[NSString alloc] initWithFormat:@"Posted %@ by %@", [postData objectForKey:@"postedAgo"], [postData objectForKey:@"postedBy"]];
+            NSString *description = [[NSString alloc] initWithFormat:@"Posted %@ by %@", [postData objectForKey:@"postedAgo"], [postData objectForKey:@"postedBy"]];
+            cell.descriptionLabel.text = description;
+            [description release];
         }
     
         
@@ -206,7 +209,12 @@
         
         
         cell.textLabel.text = [stringHtml stringByConvertingHTMLToPlainText];
-        cell.descriptionLabel.text = [[NSString alloc] initWithFormat:@"Posted %@ by %@", [comment objectForKey:@"postedAgo"], [comment objectForKey:@"postedBy"]];
+        [stringHtml release];
+        
+        NSString *description = [[NSString alloc] initWithFormat:@"Posted %@ by %@", [comment objectForKey:@"postedAgo"], [comment objectForKey:@"postedBy"]];
+        
+        cell.descriptionLabel.text = description;
+        [description release];
     }
     
     return cell;
@@ -265,9 +273,11 @@
         
         FullCommentViewController *fullCommentView = [[FullCommentViewController alloc] init];
         fullCommentView.commentString = [stringHtml stringByConvertingHTMLToPlainText];
+        [stringHtml release];
         
-        
-        fullCommentView.descriptionString = [[NSString alloc] initWithFormat:@"Posted %@ by %@", [comment objectForKey:@"postedAgo"], [comment objectForKey:@"postedBy"]];
+        NSString *description = [[NSString alloc] initWithFormat:@"Posted %@ by %@", [comment objectForKey:@"postedAgo"], [comment objectForKey:@"postedBy"]];
+        fullCommentView.descriptionString = description;
+        [description release];
         
         [self.navigationController pushViewController:fullCommentView animated:YES];
         //[stringHtml release];

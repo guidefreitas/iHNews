@@ -56,6 +56,7 @@
         [controller setMessageBody:msgBody isHTML:NO]; 
         if (controller) [self presentModalViewController:controller animated:YES];
         [controller release];
+        [msgBody release];
     }
 
 }
@@ -76,7 +77,7 @@
     UIBarButtonItem *actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(btnActionClicked:)];
     
     self.navigationItem.rightBarButtonItem = actionButton;
-    
+    [actionButton release];
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
     [webView loadRequest:requestObj];
 

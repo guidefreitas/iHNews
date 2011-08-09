@@ -29,23 +29,32 @@
     hotPostsViewController.title = @"Hot Posts";
     navConHot.tabBarItem.image = [UIImage imageNamed:@"fire.png"];
     [navConHot pushViewController:hotPostsViewController animated:NO];
+    [hotPostsViewController release];
+    
     
     UINavigationController *navConPosts = [[UINavigationController alloc] init];
     NewPostsViewController *newPosts = [[NewPostsViewController alloc] init];
     newPosts.title = @"New Posts";
-    navConPosts.tabBarItem.image = [[UIImage imageNamed:@"newspaper.png"] autorelease];
+    navConPosts.tabBarItem.image = [UIImage imageNamed:@"newspaper.png"];
     [navConPosts pushViewController:newPosts animated:NO];
+    [newPosts release];
+    
     
     UINavigationController *navConComments = [[UINavigationController alloc] init];
     NewCommentsViewController *commentsViewController = [[NewCommentsViewController alloc] init];
-    navConComments.tabBarItem.image = [[UIImage imageNamed:@"comments.png"] autorelease];
+    navConComments.tabBarItem.image = [UIImage imageNamed:@"comments.png"];
     commentsViewController.title = @"Comments";
     [navConComments pushViewController:commentsViewController animated:NO];
+    [commentsViewController release];
     
     
     NSArray *viewsController = [[NSArray alloc] initWithObjects:navConHot, navConPosts, navConComments,nil];
+    [navConHot release];
+    [navConPosts release];
+    [navConComments release];
     
     [self.tabBarController setViewControllers:viewsController];
+    [viewsController release];
     
     [self.window makeKeyAndVisible];
     return YES;
