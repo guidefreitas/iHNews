@@ -9,14 +9,22 @@
 #import <UIKit/UIKit.h>
 #import <MessageUI/MessageUI.h> 
 #import "FlurryAPI.h"
+#import "PostDownloader.h"
 
 @interface BrowserViewController : UIViewController<UIActionSheetDelegate, MFMailComposeViewControllerDelegate>{
     UIWebView *webView;
     NSURL *url;
+    NSString *siteData;
+    NSNumber *postId;
+    PostDownloader *postDownloader;
 }
 
+@property (retain) NSString *siteData;
 @property (retain) NSURL *url;
+@property (retain) NSNumber *postId;
 @property (nonatomic, retain) IBOutlet UIWebView *webView;
+@property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 
 -(IBAction)showActionSheet:(id)sender;
 

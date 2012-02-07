@@ -40,7 +40,7 @@
 	<key>NSMainNibFile~ipad</key>
 	<string>MainWindow-iPad</string>
 	<key>UIApplicationExitsOnSuspend</key>
-	<true/>
+	<false/>
 	<key>UIRequiresPersistentWiFi</key>
 	<true/>
 	<key>UISupportedInterfaceOrientations</key>

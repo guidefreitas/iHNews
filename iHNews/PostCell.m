@@ -19,7 +19,9 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         
-        
+        UIImage *backgroundImage = [UIImage imageNamed:@"cellbackground.png"];
+        self.backgroundView = backgroundImage;
+        [backgroundImage release];
         
     }
     return self;

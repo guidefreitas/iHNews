@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="562" systemVersion="11B26" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="Comment" representedClassName="Comment">
+        <attribute name="commentId" optional="YES" attributeType="Integer 32" defaultValueString="0"/>
+        <attribute name="content" optional="YES" attributeType="String"/>
+        <attribute name="points" optional="YES" attributeType="Integer 32" defaultValueString="0"/>
+        <attribute name="postedAgo" optional="YES" attributeType="String"/>
+        <attribute name="postId" optional="YES" attributeType="Integer 32" defaultValueString="0"/>
+        <attribute name="user" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="Favorite" representedClassName="Favorite">
+        <attribute name="date" optional="YES" attributeType="Date"/>
+        <relationship name="post" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="Post" inverseName="favorites" inverseEntity="Post"/>
+    </entity>
+    <entity name="Post" representedClassName="Post">
+        <attribute name="category" optional="YES" attributeType="Integer 32" defaultValueString="0"/>
+        <attribute name="commentsCount" optional="YES" attributeType="Integer 32" defaultValueString="0"/>
+        <attribute name="date" optional="YES" attributeType="Date"/>
+        <attribute name="id" attributeType="Integer 32" defaultValueString="0" indexed="YES"/>
+        <attribute name="page" optional="YES" attributeType="String"/>
+        <attribute name="points" optional="YES" attributeType="Integer 32" defaultValueString="0"/>
+        <attribute name="postedAgo" optional="YES" attributeType="String"/>
+        <attribute name="postType" optional="YES" attributeType="Integer 16"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="url" optional="YES" attributeType="String"/>
+        <attribute name="user" optional="YES" attributeType="String"/>
+        <relationship name="favorites" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Favorite" inverseName="post" inverseEntity="Favorite"/>
+    </entity>
+    <elements>
+        <element name="Comment" positionX="126" positionY="261" width="128" height="135"/>
+        <element name="Favorite" positionX="99" positionY="117" width="128" height="75"/>
+        <element name="Post" positionX="-126" positionY="216" width="128" height="225"/>
+    </elements>
+</model>

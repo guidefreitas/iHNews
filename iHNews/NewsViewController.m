@@ -11,21 +11,36 @@
 #include "JSON.h"
 #include "PostInfoViewController.h"
 #include "PostCell.h"
-#import "SVProgressHUD.h"
+
 #import "FlurryAPI.h"
+#import "Post.h"
+#import "Comment.h"
+#import "CommentDao.h"
+
 
 @implementation NewsViewController
 
-@synthesize _dataNews;
+//@synthesize _dataNews;
 @synthesize postCell;
+@synthesize managedObjectContext = __managedObjectContext;
+@synthesize fetchedResultsController = __fetchedResultsController;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
     self = [super initWithStyle:style];
     if (self) {
         // Custom initialization
-        _dataNews = [[NSMutableArray alloc] init];
+        //dataNews = [[NSMutableArray alloc] init];
         
+    }
+    return self;
+}
+
+- (id) initWithManagedContext:(NSManagedObjectContext *)context{
+    self = [super init];
+    if(self)
+    {
+        self.managedObjectContext = context;
     }
     return self;
 }
@@ -38,49 +53,47 @@
     // Release any cached data, images, etc that aren't in use.
 }
 
+- (NSFetchedResultsController *)fetchedResultsController {
+    
+    if (__fetchedResultsController != nil) {
+        return __fetchedResultsController;
+    }
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription 
+                                   entityForName:@"Post" inManagedObjectContext:__managedObjectContext];
+    [fetchRequest setEntity:entity];
+    
+    NSSortDescriptor *sort = [[NSSortDescriptor alloc] 
+                              initWithKey:@"date" ascending:NO];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObject:sort]];
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"postType == 0"];
+    [fetchRequest setPredicate:predicate];
+    
+    [fetchRequest setFetchBatchSize:30];
+    
+    NSFetchedResultsController *theFetchedResultsController = 
+    [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest 
+                                        managedObjectContext:__managedObjectContext sectionNameKeyPath:nil 
+                                                   cacheName:@"HotPostsCache"];
+    self.fetchedResultsController = theFetchedResultsController;
+    __fetchedResultsController.delegate = self;
+    
+    [sort release];
+    [fetchRequest release];
+    [theFetchedResultsController release];
+    
+    return __fetchedResultsController;    
+    
+}
+
+
 -(void)RefreshNews{
+    HUD = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+    postDownloader.hud = HUD;
+    [postDownloader UpdateHotPosts];
     
-    [SVProgressHUD showInView:self.view];
-    
-    NSURL *url = [NSURL URLWithString:@"http://api.ihackernews.com/page"];
-    __block ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
-    [request setCompletionBlock:^{
-        
-        NSString *responseString = [request responseString];
-
-        NSMutableArray *data = [responseString JSONValue];
-        
-        if(!data){
-            /*
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Erro ao busca informações" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil ];
-            [alert show];
-            [alert release];
-             */
-            [FlurryAPI logEvent:@"Screen - Hot Posts - Network Error (invalid data)"];
-            [SVProgressHUD dismissWithError:@"Network error"];
-        }
-        
-        _dataNews = [data objectForKey:@"items"];
-        [_dataNews retain];
-        
-
-        [SVProgressHUD dismiss];
-        [[self tableView] reloadData];
-
-        
-        
-    }];
-    [request setFailedBlock:^{
-        //NSError *error = [request error];
-        /*
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Erro ao busca informações" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil, nil ];
-        [alert show];
-        [alert release];
-         */
-        [FlurryAPI logEvent:@"Screen - Hot Posts - Network Error (connection error)"];
-        [SVProgressHUD dismissWithError:@"Network error"];
-    }];
-    [request startAsynchronous];
 }
 
 - (void)viewDidLoad
@@ -92,9 +105,25 @@
 
     self.navigationItem.leftBarButtonItem = refreshButton;
     [refreshButton release];
-    self.tableView.rowHeight = 120.0f;
+    self.tableView.rowHeight = 100.0f;
     
-    [self RefreshNews];
+    
+    
+    NSError *error;
+	if (![[self fetchedResultsController] performFetch:&error]) {
+		// Update to handle the error appropriately.
+		NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+		exit(-1);  // Fail
+	}
+    
+
+    postDownloader = [[PostDownloader alloc] initWithManagedContext:self.managedObjectContext];
+    
+    
+    id <NSFetchedResultsSectionInfo> sectionInfo = [[__fetchedResultsController sections] objectAtIndex:0];
+	if([sectionInfo numberOfObjects] == 0){
+        [self RefreshNews];
+    }
 }
 
 -(void) btnRefreshClicked:(id)sender{
@@ -140,24 +169,33 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
+    return 1;
     
-    if([_dataNews count] != 0){
-        return 1;
-    }
-     
-    
-    return 0;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     
-    if([_dataNews count] != 0){
-        return [_dataNews count];
-    }
-     
-    return 0;
+    id <NSFetchedResultsSectionInfo> sectionInfo = [[__fetchedResultsController sections] objectAtIndex:section];
+	return [sectionInfo numberOfObjects];
 
+}
+
+- (void)configureCell:(PostCell *)cell atIndexPath:(NSIndexPath *)indexPath {
+	Post *post = [__fetchedResultsController objectAtIndexPath:indexPath];
+    cell.textLabel.text = post.title;
+    cell.descriptionLabel.text =  [[[NSString alloc] initWithFormat:@"%@ points and %@ comments", post.points ,post.commentsCount] autorelease];
+    /*
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul);
+    dispatch_async(queue, ^{
+        Post *post = [__fetchedResultsController objectAtIndexPath:indexPath];
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            
+            cell.textLabel.text = post.title;
+            cell.descriptionLabel.text =  [[[NSString alloc] initWithFormat:@"%@ points and %@ comments", post.points ,post.commentsCount] autorelease];
+        });
+    });
+     */
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -172,15 +210,64 @@
         self.postCell = nil;
     }
     
-    NSDictionary *obj = [_dataNews objectAtIndex:indexPath.row];
-    if(obj){
-        cell.textLabel.text = [obj objectForKey:@"title"];
-        cell.descriptionLabel.text =  [[[NSString alloc] initWithFormat:@"%@ points and %@ comments", [obj objectForKey:@"points"] ,[obj objectForKey:@"commentCount"]] autorelease]; 
-    }
+    [self configureCell:cell atIndexPath:indexPath];
     
     return cell;
      
     
+}
+
+- (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
+    // The fetch controller is about to start sending change notifications, so prepare the table view for updates.
+    [self.tableView beginUpdates];
+}
+
+
+- (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath {
+    
+    UITableView *tableView = self.tableView;
+    
+    switch(type) {
+            
+        case NSFetchedResultsChangeInsert:
+            [tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+            break;
+            
+        case NSFetchedResultsChangeDelete:
+            [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
+            break;
+            
+        case NSFetchedResultsChangeUpdate:
+            [self configureCell:[tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
+            break;
+            
+        case NSFetchedResultsChangeMove:
+            [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
+            // Reloading the section inserts a new row and ensures that titles are updated appropriately.
+            [tableView reloadSections:[NSIndexSet indexSetWithIndex:newIndexPath.section] withRowAnimation:UITableViewRowAnimationFade];
+            break;
+    }
+}
+
+
+- (void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type {
+    
+    switch(type) {
+            
+        case NSFetchedResultsChangeInsert:
+            [self.tableView insertSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
+            break;
+            
+        case NSFetchedResultsChangeDelete:
+            [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:sectionIndex] withRowAnimation:UITableViewRowAnimationFade];
+            break;
+    }
+}
+
+
+- (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
+    // The fetch controller has sent all current change notifications, so tell the table view to process all updates.
+    [self.tableView endUpdates];
 }
 
 /*
@@ -224,32 +311,35 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    // Navigation logic may go here. Create and push another view controller.
-    /*
-     <#DetailViewController#> *detailViewController = [[<#DetailViewController#> alloc] initWithNibName:@"<#Nib name#>" bundle:nil];
-     // ...
-     // Pass the selected object to the new view controller.
-     [self.navigationController pushViewController:detailViewController animated:YES];
-     [detailViewController release];
-     */
-    
-    
-    if([_dataNews count] != 0){
-        
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul);
+    dispatch_async(queue, ^{
+        CommentDao *commentDao = [[CommentDao alloc] init];
+        commentDao.managedObjectContext = self.managedObjectContext;
         PostInfoViewController *postInfo = [[PostInfoViewController alloc] init];
+        Post *postSelected = [self.fetchedResultsController objectAtIndexPath:indexPath];
+        NSArray *comments = [commentDao FindByPostId:postSelected.id];
+        postInfo.managedObjectContext = self.managedObjectContext;
+        postInfo.post = postSelected;
+        postInfo.comments = comments;
         
-        NSDictionary *obj = [_dataNews objectAtIndex:indexPath.row];
-        
-        postInfo.postId = [obj objectForKey:@"id"];
-        
-        [self.navigationController pushViewController:postInfo animated:YES];
-        [postInfo release];
-         
-        
-    }
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self.navigationController pushViewController:postInfo animated:YES];
+        });
+    });
     
-    
-    
+    /*
+    CommentDao *commentDao = [[CommentDao alloc] init];
+    commentDao.managedObjectContext = self.managedObjectContext;
+    PostInfoViewController *postInfo = [[PostInfoViewController alloc] init];
+    Post *postSelected = [self.fetchedResultsController objectAtIndexPath:indexPath];
+    NSArray *comments = [commentDao FindByPostId:postSelected.id];
+    postInfo.managedObjectContext = self.managedObjectContext;
+    postInfo.post = postSelected;
+    postInfo.comments = comments;
+    [self.navigationController pushViewController:postInfo animated:YES];
+    [postInfo release];
+    [postSelected release];
+    */
 }
 
 @end

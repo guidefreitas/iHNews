@@ -9,15 +9,22 @@
 #import <UIKit/UIKit.h>
 #import "PostCell.h"
 #import "FlurryAPI.h"
+#import <CoreData/CoreData.h>
+#import "MBProgressHUD.h"
+#import "PostDownloader.h"
 
 @class PostCell;
-@interface NewPostsViewController : UITableViewController{
+@interface NewPostsViewController : UITableViewController<NSFetchedResultsControllerDelegate, MBProgressHUDDelegate>{
 @private
-    NSArray *_dataNews;
+    //NSArray *_dataNews;
     PostCell *postCell;
+    PostDownloader *postDownloader;
+    MBProgressHUD *HUD;
 }
 
-@property (retain) NSArray *_dataNews;
+//@property (retain) NSArray *_dataNews;
+@property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 @property (nonatomic, retain) IBOutlet PostCell *postCell;
 
 

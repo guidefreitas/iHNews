@@ -7,15 +7,25 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreData/CoreData.h>
+#import "MBProgressHUD.h"
+#import "PostDownloader.h"
 
 @class PostCell;
-@interface NewsViewController : UITableViewController{
+@interface NewsViewController : UITableViewController<NSFetchedResultsControllerDelegate, MBProgressHUDDelegate>{
 @private
-    NSArray *_dataNews;
+    //NSArray *_dataNews;
     PostCell *postCell;
+    MBProgressHUD *HUD;
+    PostDownloader *postDownloader;
 }
 
 @property (nonatomic, retain) IBOutlet PostCell *postCell;
-@property (retain) NSArray *_dataNews;
+//@property (retain) NSArray *_dataNews;
+@property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
+
+- (id) initWithManagedContext:(NSManagedObjectContext *)context;
+
 
 @end

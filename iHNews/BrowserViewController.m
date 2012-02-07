@@ -13,6 +13,10 @@
 
 @synthesize webView;
 @synthesize url;
+@synthesize siteData;
+@synthesize postId;
+@synthesize managedObjectContext = __managedObjectContext;
+@synthesize fetchedResultsController = __fetchedResultsController;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -32,7 +36,7 @@
 }
 
 -(IBAction)showActionSheet:(id)sender{
-    UIActionSheet *popupQuery = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Open in Safari", @"Send by Email", nil];
+    UIActionSheet *popupQuery = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Add to Favorites", @"Open in Safari", @"Send by Email", nil];
     popupQuery.actionSheetStyle = UIActionSheetStyleBlackOpaque;
     [popupQuery showInView:self.view];
     [popupQuery release];
@@ -43,11 +47,15 @@
 
     NSLog(@"clickeed");
     if (buttonIndex == 0) {
+        [postDownloader AddFavoritePost:postId];
+    }
+    
+    if (buttonIndex == 1) {
         [FlurryAPI logEvent:@"Screen - Browser - Action - Open Safari"];
         [[UIApplication sharedApplication] openURL:url];
     }
     
-    if(buttonIndex == 1){
+    if(buttonIndex == 2){
         [FlurryAPI logEvent:@"Screen - Browser - Action - Send Mail"];
         MFMailComposeViewController* controller = [[MFMailComposeViewController alloc] init];
         controller.mailComposeDelegate = self;
@@ -78,9 +86,15 @@
     
     self.navigationItem.rightBarButtonItem = actionButton;
     [actionButton release];
+    
+    postDownloader = [[PostDownloader alloc] initWithManagedContext:self.managedObjectContext];
+    
+    if(!siteData){
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
     [webView loadRequest:requestObj];
-
+    }else{
+        [webView loadHTMLString: siteData baseURL: url];
+    }
     // Do any additional setup after loading the view from its nib.
 }
 

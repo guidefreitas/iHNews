@@ -7,23 +7,30 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "PostCell.h"
+#import "PostInfoCell.h"
 #import "FlurryAPI.h"
+#import "PostDownloader.h"
+#import "Post.h"
+#import <CoreData/CoreData.h>
 
 @class PostCell;
 @interface PostInfoViewController : UITableViewController{
     UIView *loadingPanel;
     UIView *loadedPanel;
-    NSDictionary *postData;
+    Post *post;
     NSArray *comments;
     NSNumber *postId;
-    PostCell *postCell;
+    PostInfoCell *postCell;
     
 }
 
-@property (nonatomic, retain) IBOutlet PostCell *postCell;
+@property (retain) NSArray *comments;
+@property (retain) Post *post;
+@property (nonatomic, retain) IBOutlet PostInfoCell *postCell;
 @property (nonatomic, retain) NSNumber *postId;
 @property (nonatomic, retain) IBOutlet UIView *loadedPanel;
 @property (nonatomic, retain) IBOutlet UIView *loadingPanel;
+@property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, retain) NSFetchedResultsController *fetchedResultsController;
 
 @end
